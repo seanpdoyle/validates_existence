@@ -75,12 +75,23 @@ module Perfectline
 
     module ClassMethods
       def validates_existence_of(*attr_names)
-        validates_with ActiveRecord::Base::ExistenceValidator, _merge_attributes(attr_names)
+        if defined?(ActiveModel::Model)
+          klass = ActiveModel::Model
+        else
+          klass = ActiveRecord::Base
+        end
+        validates_with klass, _merge_attributes(attr_names)
       end
     end
 
   end
 end
 
-ActiveRecord::Base.send(:include, Perfectline::ValidatesExistence::Validator)
-ActiveRecord::Base.send(:extend, Perfectline::ValidatesExistence::ClassMethods)
+if defined?(ActiveModel::Model)
+  klass = ActiveModel::Model
+else
+  klass = ActiveRecord::Base
+end
+
+klass.send(:include, Perfectline::ValidatesExistence::Validator)
+klass.send(:extend, Perfectline::ValidatesExistence::ClassMethods)
